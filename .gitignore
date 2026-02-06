@@ -1,0 +1,20 @@
+# Build artifacts
+*.o
+*.obj
+*.exe
+*.dll
+*.so
+*.a
+
+# VS Code
+.vscode/
+
+# OS junk
+Thumbs.db
+.DS_Store
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
