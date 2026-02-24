@@ -3,10 +3,11 @@
 #include <stdint.h>
 #include "matrix.h"
 #include "poly.h"
+#include "sample.h"
 
 int main() {
 
-    uint8_t seed[32] = {0};
+    uint8_t seed[32] = {1};
 
     matrix_t A1, A2;
     matrix_expand(&A1, seed);
@@ -34,5 +35,21 @@ int main() {
         }
 
     printf("Matrix tests passed.\n");
+
+    qs_prng_t prng1, prng2;
+    prng_init(&prng1, seed);
+    prng_init(&prng2, seed);
+
+    poly_t a, b;
+
+    sample_small_poly(&a, &prng1);
+    sample_small_poly(&b, &prng2);
+
+    if (memcmp(&a, &b, sizeof(poly_t)) != 0) {
+        printf("Sampler not deterministic\n");
+        return 1;
+    }
+
+    printf("Sampler test passed.\n");
     return 0;
 }
