@@ -10,7 +10,7 @@ void sample_small_poly(poly_t *p, qs_prng_t *prng)
         uint8_t r = buf[i] % 3;
 
         if (r == 0)
-            p->coeffs[i] = -1;
+            p->coeffs[i] = Q - 1;   // represent -1 as Q-1
         else if (r == 1)
             p->coeffs[i] = 0;
         else

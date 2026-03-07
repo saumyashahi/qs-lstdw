@@ -12,4 +12,6 @@ typedef struct {
 void prng_init(qs_prng_t *ctx, const uint8_t seed[32]);
 void prng_squeeze(qs_prng_t *ctx, uint8_t *out, size_t outlen);
 
+uint32_t prng_uint32(qs_prng_t *ctx);
+
 #endif

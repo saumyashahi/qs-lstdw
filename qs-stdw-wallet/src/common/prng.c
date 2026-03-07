@@ -21,3 +21,15 @@ void prng_squeeze(qs_prng_t *ctx, uint8_t *out, size_t outlen)
 
     ctx->counter++;
 }
+
+uint32_t prng_uint32(qs_prng_t *ctx)
+{
+    uint8_t buf[4];
+
+    prng_squeeze(ctx, buf, 4);
+
+    return ((uint32_t)buf[0]) |
+           ((uint32_t)buf[1] << 8) |
+           ((uint32_t)buf[2] << 16) |
+           ((uint32_t)buf[3] << 24);
+}

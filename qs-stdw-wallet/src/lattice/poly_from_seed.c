@@ -24,16 +24,16 @@ static void i2osp(uint16_t i, uint8_t out[2])
 void poly_from_seed(int32_t a[QS_N], const uint8_t seed[SEED_BYTES])
 {
     uint8_t input[SEED_BYTES + 2];
-    uint8_t output[1];
+    uint8_t output;
 
     for (uint16_t i = 0; i < QS_N; i++) {
 
         memcpy(input, seed, SEED_BYTES);
         i2osp(i, input + SEED_BYTES);
 
-        shake256(output, 1, input, sizeof(input));
+        shake256(&output, 1, input, sizeof(input));
 
-        int32_t val = decode_small(output[0]);
+        int32_t val = decode_small(output);
 
         if (val < 0)
             val += Q;

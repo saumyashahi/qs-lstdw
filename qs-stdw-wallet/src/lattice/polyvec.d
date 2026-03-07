@@ -1,0 +1,9 @@
+src/lattice/polyvec.o: src/lattice/polyvec.c src/lattice/polyvec.h \
+ src/lattice/../common/prng.h src/lattice/matrix.h config/params.h \
+ src/lattice/poly.h src/lattice/../../config/params.h
+src/lattice/polyvec.h:
+src/lattice/../common/prng.h:
+src/lattice/matrix.h:
+config/params.h:
+src/lattice/poly.h:
+src/lattice/../../config/params.h:
