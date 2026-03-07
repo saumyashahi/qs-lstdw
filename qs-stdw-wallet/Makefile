@@ -20,6 +20,7 @@ SRC_KEYGEN = src/keygen/master_keygen.c
 SRC_THRESHOLD = src/threshold/shamir.c \
                   src/threshold/rerandomize.c
 
+SRC_RANDPK = src/derivation/rand_pk.c
 # ================================
 # Test files
 # ================================
@@ -29,6 +30,7 @@ SRC_TEST_MATRIX = tests/test_matrix.c
 SRC_TEST_MASTER = tests/test_master_keygen.c
 SRC_TEST_SHAMIR = tests/test_shamir.c
 SRC_TEST_RERANDOMIZE = tests/test_rerandomize.c
+SRC_TEST_RANDPK = tests/test_randpk.c
 
 # ================================
 # Object files (core modules only)
@@ -37,8 +39,10 @@ SRC_TEST_RERANDOMIZE = tests/test_rerandomize.c
 OBJS_COMMON = $(SRC_COMMON:.c=.o)
 OBJS_LATTICE = $(SRC_LATTICE:.c=.o)
 OBJS_KEYGEN = $(SRC_KEYGEN:.c=.o)
+OBJS_RANDPK = $(SRC_RANDPK:.c=.o)
+OBJS_THRESHOLD = $(SRC_THRESHOLD:.c=.o)
 
-OBJS_CORE = $(OBJS_COMMON) $(OBJS_LATTICE) $(OBJS_KEYGEN) $(SRC_THRESHOLD:.c=.o)
+OBJS_CORE = $(OBJS_COMMON) $(OBJS_LATTICE) $(OBJS_KEYGEN) $(OBJS_RANDPK) $(OBJS_THRESHOLD)
 
 DEPS = $(OBJS_CORE:.o=.d)
 
@@ -46,7 +50,7 @@ DEPS = $(OBJS_CORE:.o=.d)
 # Targets
 # ================================
 
-all: test_poly test_matrix test_master
+all: test_poly test_matrix test_master test_shamir test_rerandomize test_randpk
 
 test_poly: $(OBJS_CORE) $(SRC_TEST_POLY:.c=.o)
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
@@ -63,6 +67,9 @@ test_shamir: $(OBJS_CORE) $(SRC_TEST_SHAMIR:.c=.o)
 test_rerandomize: $(OBJS_CORE) $(SRC_TEST_RERANDOMIZE:.c=.o)
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
 
+test_randpk: $(OBJS_CORE) $(SRC_TEST_RANDPK:.c=.o)
+	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
+
 # ================================
 # Compile rule
 # ================================
@@ -77,7 +84,7 @@ clean:
 	      $(SRC_TEST_MASTER:.c=.o) \
 	      $(SRC_TEST_SHAMIR:.c=.o) \
 	      $(DEPS) \
-	      test_poly test_matrix test_master test_shamir
+	      test_poly test_matrix test_master test_shamir test_rerandomize test_randpk
 
 -include $(DEPS)
 

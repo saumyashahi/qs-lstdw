@@ -13,11 +13,11 @@ int main(void)
 
     /* Run key generation */
     master_keygen(
-        &mpk,
-        parties,
-        chaincode,
-        N,
-        T
+       &mpk,
+       parties,
+       chaincode,
+       N,
+       T
     );
 
     /* Print first coefficient of t[0] */

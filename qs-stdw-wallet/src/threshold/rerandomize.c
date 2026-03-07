@@ -6,34 +6,6 @@
 #include "../lattice/polyvec.h"
 #include <string.h>
 
-
-//for error 1 : which was missing definition of hash_sha256, ig doing #include<openssl/sha.h> and define hash_sha256 as a wrapper around SHA256 function from OpenSSL library which has the implementation readt in it (does 32 bytes)
-
-//for error 2 : which was missing definition of polyvec_l_uniform, ig define it as a function that fills a polyvec_l_t with random polynomials using the provided PRNG
-/*
-qs_prng_t prng;
-prng_init(&prng, seed);
-*/
-
-//for error 3 : which was missing definition of polyvec_l_zero, ig define it as a function that sets all coefficients of a polyvec_l_t to zero
-/*
-polyvec_l_zero(result); bakwas
-*/
-
-//for error 4 : which was missing definition of polyvec_l_copy, ig define it as a function that copies one polyvec_l_t to another
-/*loop to copy type shi*/
-
-//for error 5 : which was missing definition of polyvec_l_mul_scalar, ig define it as a function that multiplies each coefficient of a polyvec_l_t by a scalar value
-
-/*
-error 5,6 are very run a for loop type shi to do shi
-polyvec_l_mul_scalar(&temp, power);
-polyvec_l_add(result, result, &temp);
-
-*/
-//for error 6 : which was missing definition of polyvec_l_add, ig define it as a function that adds two polyvec_l_t together and stores the result in a third polyvec_l_t   
-
-
 /* derive 32-byte seed = H(chaincode || session_id) */
 static void derive_seed(uint8_t out[32],
                         const uint8_t chaincode[CHAINCODE_BYTES],

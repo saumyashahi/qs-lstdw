@@ -29,4 +29,22 @@ int polyvec_l_equal(const polyvec_l_t *a,
 
 void polyvec_l_uniform(polyvec_l_t *v, 
                         qs_prng_t *prng);
+
+/* polyvec_k operations */
+
+void polyvec_k_zero(polyvec_k_t *v);
+
+void polyvec_k_copy(polyvec_k_t *dst,
+                    const polyvec_k_t *src);
+
+void polyvec_k_add(polyvec_k_t *r,
+                   const polyvec_k_t *a,
+                   const polyvec_k_t *b);
+
+int polyvec_k_equal(const polyvec_k_t *a,
+                    const polyvec_k_t *b);
+
+void polyvec_k_uniform(polyvec_k_t *v,
+                       qs_prng_t *prng);
+                       
 #endif
