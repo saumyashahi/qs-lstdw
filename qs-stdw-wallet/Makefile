@@ -45,6 +45,15 @@ SRC_TEST_SIGN        = tests/test_sign.c
 SRC_TEST_VERIFY      = tests/test_verify.c
 
 # ================================
+# Wallet & Network Simulation files
+# ================================
+
+SRC_WALLET = src/wallet/wallet_init.c src/wallet/wallet_sign.c src/wallet/wallet_verify.c
+OBJS_WALLET = $(SRC_WALLET:.c=.o)
+
+SRC_SIM = src/net/local_sim.c
+
+# ================================
 # Object files (core modules only)
 # ================================
 
@@ -55,15 +64,15 @@ OBJS_RANDPK    = $(SRC_RANDPK:.c=.o)
 OBJS_THRESHOLD = $(SRC_THRESHOLD:.c=.o)
 OBJS_SIGN      = $(SRC_SIGN:.c=.o)
 
-OBJS_CORE = $(OBJS_COMMON) $(OBJS_LATTICE) $(OBJS_KEYGEN) $(OBJS_RANDPK) $(OBJS_THRESHOLD) $(OBJS_SIGN)
+OBJS_CORE = $(OBJS_COMMON) $(OBJS_LATTICE) $(OBJS_KEYGEN) $(OBJS_RANDPK) $(OBJS_THRESHOLD) $(OBJS_SIGN) $(OBJS_WALLET)
 
-DEPS = $(OBJS_CORE:.o=.d)
+DEPS = $(OBJS_CORE:.o=.d) $(SRC_SIM:.c=.d)
 
 # ================================
 # Targets
 # ================================
 
-all: test_poly test_matrix test_master test_shamir test_rerandomize test_randpk test_sign test_verify
+all: test_poly test_matrix test_master test_shamir test_rerandomize test_randpk test_sign test_verify local_sim
 
 test_poly: $(OBJS_CORE) $(SRC_TEST_POLY:.c=.o)
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
@@ -89,6 +98,9 @@ test_sign: $(OBJS_CORE) $(SRC_TEST_SIGN:.c=.o)
 test_verify: $(OBJS_CORE) $(SRC_TEST_VERIFY:.c=.o)
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
 
+local_sim: $(OBJS_CORE) $(SRC_SIM:.c=.o)
+	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
+
 # ================================
 # Compile rule
 # ================================
@@ -106,8 +118,9 @@ clean:
 	      $(SRC_TEST_RANDPK:.c=.o) \
 	      $(SRC_TEST_SIGN:.c=.o) \
 	      $(SRC_TEST_VERIFY:.c=.o) \
+	      $(SRC_SIM:.c=.o) \
 	      $(DEPS) \
-	      test_poly test_matrix test_master test_shamir test_rerandomize test_randpk test_sign test_verify
+	      test_poly test_matrix test_master test_shamir test_rerandomize test_randpk test_sign test_verify local_sim
 
 -include $(DEPS)
 
