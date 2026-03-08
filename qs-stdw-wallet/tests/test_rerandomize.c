@@ -89,10 +89,14 @@ int main() {
         T
     );
 
+    printf("\n=========================================================\n");
+    printf("   RERANDOMIZATION TEST\n");
+    printf("=========================================================\n");
+
     /* reconstruct original */
     int32_t original = reconstruct(parties, T);
 
-    printf("Original reconstructed secret = %d\n", original);
+    printf("[INFO] Original reconstructed secret = %d\n", original);
 
     /* copy parties */
     party_secret_t parties_copy[N];
@@ -110,15 +114,15 @@ int main() {
     /* reconstruct again */
     int32_t after = reconstruct(parties_copy, T);
 
-    printf("After rerandomization secret = %d\n", after);
+    printf("[INFO] After rerandomization secret = %d\n", after);
 
     /* verify invariant */
     if (original != after) {
-        printf("ERROR: secret changed!\n");
+        printf("[FAIL] ERROR: secret changed!\n");
         return 1;
     }
 
-    printf("Secret invariant verified.\n");
+    printf("[PASS] Secret invariant verified\n");
 
     /* verify shares changed */
     int changed = 0;
@@ -130,12 +134,12 @@ int main() {
     }
 
     if (!changed) {
-        printf("ERROR: shares did not change!\n");
+        printf("[FAIL] ERROR: shares did not change!\n");
         return 1;
     }
 
-    printf("Shares successfully rerandomized.\n");
+    printf("[PASS] Shares successfully rerandomized\n");
 
-    printf("TEST PASSED.\n");
+    printf("=========================================================\n");
     return 0;
 }

@@ -28,17 +28,26 @@ int main()
     derive_session_pk(&pk1, &mpk, seed, sid1);
     derive_session_pk(&pk2, &mpk, seed, sid1);
 
+    printf("\n=========================================================\n");
+    printf("   RANDOMIZED PUBLIC KEY DERIVATION TEST\n");
+    printf("=========================================================\n");
+
     if (polyvec_k_equal(&pk1.t_prime, &pk2.t_prime))
-        printf("Deterministic derivation OK\n");
-    else
-        printf("ERROR: deterministic derivation failed\n");
+        printf("[PASS] Deterministic derivation OK\n");
+    else {
+        printf("[FAIL] ERROR: deterministic derivation failed\n");
+        return 1;
+    }
 
     derive_session_pk(&pk2, &mpk, seed, sid2);
 
     if (!polyvec_k_equal(&pk1.t_prime, &pk2.t_prime))
-        printf("Session IDs produce different keys\n");
-    else
-        printf("ERROR: session keys identical\n");
+        printf("[PASS] Session IDs produce different keys\n");
+    else {
+        printf("[FAIL] ERROR: session keys identical\n");
+        return 1;
+    }
 
+    printf("=========================================================\n");
     return 0;
 }

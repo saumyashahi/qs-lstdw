@@ -20,21 +20,28 @@ int main(void)
        T
     );
 
+    printf("\n=========================================================\n");
+    printf("   MASTER KEYGEN TEST\n");
+    printf("=========================================================\n");
+
     /* Print first coefficient of t[0] */
-    printf("t[0].coeffs[0] = %u\n",
+    printf("[INFO] t[0].coeffs[0] = %u\n",
            mpk.t.vec[0].coeffs[0]);
 
     /* Print first byte of seed_A */
-    printf("seed_A[0] = %u\n",
+    printf("[INFO] seed_A[0] = %u\n",
            mpk.seed_A[0]);
 
     /* Print chaincode */
-    printf("chaincode[0] = %u\n",
+    printf("[INFO] chaincode[0] = %u\n",
            chaincode[0]);
 
     /* Print first party share coefficient */
-    printf("party[0] first coeff = %u\n",
+    printf("[INFO] party[0] first coeff = %u\n",
            parties[0].share.vec[0].coeffs[0]);
+
+    printf("[PASS] Master Keygen outputs OK\n");
+    printf("=========================================================\n");
 
     return 0;
 }

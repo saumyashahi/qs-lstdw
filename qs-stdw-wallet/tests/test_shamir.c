@@ -23,50 +23,51 @@ static int compare_polyvec(const polyvec_l_t *a,
 
 int main(void)
 {
-    master_public_key_t mpk;
-    master_secret_key_t msk;
-
-    /* 1. Generate master key */
-    master_keygen(&mpk, &msk);
-
-    /* 2. Prepare PRNG for Shamir randomness */
+    /* 1. Generate a random secret to split */
     qs_prng_t prng;
     uint8_t seed[32];
     memset(seed, 0xAA, 32);  /* deterministic test seed */
     prng_init(&prng, seed);
 
-    /* 3. Split secret */
+    polyvec_l_t secret;
+    polyvec_l_uniform(&secret, &prng);
+
+    /* 2. Split secret */
     shamir_share_t shares[NUM_SHARES];
 
-    shamir_split(&msk.s,
+    shamir_split(&secret,
                  shares,
                  NUM_SHARES,
                  THRESHOLD,
                  &prng);
 
-    /* 4. Reconstruct using first THRESHOLD shares */
+    /* 3. Reconstruct using first THRESHOLD shares */
     polyvec_l_t reconstructed;
 
     shamir_reconstruct(&reconstructed,
                        shares,
                        THRESHOLD);
 
-    /* 5. Compare */
-    if (compare_polyvec(&msk.s, &reconstructed)) {
-        printf("Shamir reconstruction SUCCESS\n");
+    printf("\n=========================================================\n");
+    printf("   SHAMIR SECRET SHARING TEST\n");
+    printf("=========================================================\n");
+
+    /* 4. Compare */
+    if (compare_polyvec(&secret, &reconstructed)) {
+        printf("[PASS] Shamir reconstruction SUCCESS\n");
     } else {
-        printf("Shamir reconstruction FAILED\n");
+        printf("[FAIL] ERROR: Shamir reconstruction FAILED\n");
 
         /* Print first mismatch for debugging */
         for (int i = 0; i < QS_L; i++) {
             for (int k = 0; k < QS_N; k++) {
-                if (msk.s.vec[i].coeffs[k] !=
+                if (secret.vec[i].coeffs[k] !=
                     reconstructed.vec[i].coeffs[k]) {
 
-                    printf("Mismatch at vec %d coeff %d:\n", i, k);
-                    printf("Original: %u\n",
-                           msk.s.vec[i].coeffs[k]);
-                    printf("Reconstructed: %u\n",
+                    printf("[FAIL] Mismatch at vec %d coeff %d:\n", i, k);
+                    printf("[INFO] Original: %u\n",
+                           secret.vec[i].coeffs[k]);
+                    printf("[INFO] Reconstructed: %u\n",
                            reconstructed.vec[i].coeffs[k]);
                     return 1;
                 }
@@ -74,5 +75,6 @@ int main(void)
         }
     }
 
+    printf("=========================================================\n");
     return 0;
 }
