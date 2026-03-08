@@ -3,12 +3,20 @@
 #include "../common/prng.h"
 #include <string.h>
 
-/*
-    Session public key derivation
-
-    t' = t + A * f
-*/
-
+/**
+ * @brief Algorithm 3: QS-STDW.RandPK(mpk, seed_{i, j}, {sessID_j}_{j=1}^s)
+ * Rerandomize Public Key for Multiple Sessions
+ * 
+ * 1. for j = 1 to s do
+ * 2.   rho_j <- H(seed_{i, j} || sessID_j)
+ * 3.   f_j(x) <- POLYFROMSEED(rho_j, T - 1, q)
+ * 4.   t_{pk_j} <- t_{pk} + A * f_j(0) mod q
+ * 5.   pk_j <- (A, t_{pk_j})
+ * 6. return {pk_j}_{j=1}^s
+ * 
+ * Note: This implementation processes a single session_id per call and evaluates
+ * the polynomial at x=0 by directly expanding the pseudo-random vector.
+ */
 void derive_session_pk(
     session_pk_t *out,
     const public_key_t *mpk,

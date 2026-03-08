@@ -4,9 +4,19 @@
 #include "../lattice/sample.h"
 #include <string.h>
 
-/*
- * Verify a completed signature.
- * This is a clean wrapper around qs_verify, using the wallet's stored parameters.
+/**
+ * @brief Algorithm 5: QS-STDW.Verify(sigma, msg, pk_j)
+ * Threshold Deterministic Wallet Signature Verification
+ * 
+ * 1. Parse signature sigma as (c, z, h)
+ * 2. w' := A * z - c * t_{pk_{sess}} mod q
+ * 3. w' := UseHint(h, w')
+ * 4. c' := H(msg || w')
+ * 5. if c' == c and ||z||_inf <= BETA_Z and ||w'||_inf <= BETA_W:
+ * 6.    return VALID (1)
+ * 7. else:
+ * 8.    return INVALID (0)
+ * 
  * Critically, a Verifier must deterministically derive the session public key 
  * mathematically from the master public key and the chaincode.
  */

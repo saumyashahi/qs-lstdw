@@ -20,9 +20,30 @@ static int find_active_index(uint32_t my_id, const int *active_set, int active_c
     return -1;
 }
 
-/* 
- * Start a signing session (Round 1).
- * Derives the session ID, rerandomizes the PK and SK share, and produces Round 1 commit.
+/**
+ * @brief Algorithm 4: QS-STDW.Sign(msg, {sk_{j, k}}_{k \in act}, act, pk_j)
+ * Threshold Signing Protocol via Network Interaction
+ * 
+ * Round 1 (Commitment):
+ * 1. Each party k \in act:
+ * 2.   y_k <- D_gamma1^l, r_k <- D_gamma1^l
+ * 3.   w_k := A * y_k + r_k mod q
+ * 4.   Broadcast w_k
+ * 
+ * Round 2 (Challenge):
+ * 5.   w := \sum_{k \in act} w_k mod q
+ * 6.   c <- H(msg || w)
+ * 7.   c(x) <- Expand(c)
+ * 
+ * Round 3 (Response):
+ * 8. Each party k \in act:
+ * 9.   z_k := y_k + c * s_{j, k} * \lambda_{k, act}
+ * 10.  Broadcast z_k
+ * 
+ * Round 4 (Combine):
+ * 11.  z := \sum_{k \in act} z_k
+ * 12.  h <- MakeHint(w, A*z - c*t_{pk_{sess}} mod q)
+ * 13.  return \sigma = (c, z, h)
  */
 int wallet_sign_round1(qs_wallet_t *w,
                        const uint8_t *msg,

@@ -9,6 +9,22 @@
 #include "../lattice/polyvec.h"
 #include <string.h>
 
+/**
+ * @brief Algorithm 1: QS-STDW.KGen(lambda, T, N)
+ * Threshold Lattice-Based Deterministic Wallet Master Key Generation
+ * 
+ * 1. A <- R_q^{k \times l}
+ * 2. (msk, e) <- D_{t}^{l} \times D_{t}^{k}
+ * 3. t := A * msk + e
+ * 4. mpk := (A, t)
+ * 5. P <- R_q^l[X] with deg(P) = T - 1, P(0) = msk
+ * 6. (s_i)_{i \in [N]} := (P(i))_{i \in [N]}
+ * 7. (pk_{sig, i}, sk_{sig, i}) <- KeyGen_{sig}(1^kappa) for i \in [N]
+ * 8. seed_{i, k} <- {0, 1}^kappa for i, k \in [N]
+ * 9. msk_i := (s_i, (pk_{sig, k})_{k \in [N]}, sk_{sig, i}, (seed_{i, k}, seed_{k, i})_{k \in [N]})
+ * 10. ch <- RANDOMBITS(lambda)
+ * 11. return (mpk, {msk_i}_{i=1}^N, ch)
+ */
 void master_keygen(master_public_key_t *mpk,
                    party_secret_t parties[MAX_PARTIES],
                    uint8_t chaincode[CHAINCODE_BYTES],

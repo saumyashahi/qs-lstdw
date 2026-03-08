@@ -58,6 +58,21 @@ static void eval_polyvec(polyvec_l_t *result,
     }
 }
 
+/**
+ * @brief Algorithm 2: QS-STDW.RandSK({msk_i}_{i=1}^N, ch, {sessID_j}_{j=1}^s)
+ * Rerandomize Secret Shares for Multiple Sessions
+ * 
+ * 1. for j = 1 to s do:
+ * 2.   rho_j <- H(ch || sessID_j)
+ * 3.   f_j(x) <- POLYFROMSEED(rho_j, T - 1, q)
+ * 4.   for i = 1 to N do:
+ * 5.     parse msk_i as (s_i, ...)
+ * 6.     s_{j, i} <- s_i + f_j(i) mod q
+ * 7.     sk_{j, i} <- (s_{j, i}, ...)
+ * 8. return {sk_{j, i}}_{j=1..s, i=1..N}
+ * 
+ * Note: This implementation processes a single session_id per call.
+ */
 void rerandomize_shares(party_secret_t parties[],
                         int N,
                         int T,
