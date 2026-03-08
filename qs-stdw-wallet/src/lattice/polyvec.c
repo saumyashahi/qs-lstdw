@@ -150,3 +150,154 @@ void polyvec_k_uniform(polyvec_k_t *v,
         }
     }
 }
+
+/* ---------------------------------------------------------------------------
+ * New operations required for Algorithm 4 (Signing) and Algorithm 5 (Verify)
+ * --------------------------------------------------------------------------- */
+
+/*
+ * out[i] = c * v[i]  for all i in [L]
+ * Polynomial ring multiplication of each component by challenge poly c.
+ */
+void polyvec_l_mul_poly(polyvec_l_t *out,
+                        const poly_t *c,
+                        const polyvec_l_t *v)
+{
+    for (int i = 0; i < QS_L; i++)
+        poly_mul(&out->vec[i], c, &v->vec[i]);
+}
+
+/*
+ * out[i] = c * v[i]  for all i in [K]
+ */
+void polyvec_k_mul_poly(polyvec_k_t *out,
+                        const poly_t *c,
+                        const polyvec_k_t *v)
+{
+    for (int i = 0; i < QS_K; i++)
+        poly_mul(&out->vec[i], c, &v->vec[i]);
+}
+
+/*
+ * r = a - b  (coefficient-wise, mod Q)
+ */
+void polyvec_k_sub(polyvec_k_t *r,
+                   const polyvec_k_t *a,
+                   const polyvec_k_t *b)
+{
+    for (int i = 0; i < QS_K; i++)
+        poly_sub(&r->vec[i], &a->vec[i], &b->vec[i]);
+}
+
+/*
+ * Sample ephemeral vector: coefficients uniform in [-(GAMMA1-1), GAMMA1]
+ * Uses rejection sampling from PRNG output.
+ */
+void polyvec_l_sample_gamma1(polyvec_l_t *v, qs_prng_t *prng)
+{
+    for (int i = 0; i < QS_L; i++)
+    {
+        for (int j = 0; j < QS_N; j++)
+        {
+            uint32_t r;
+            /* Rejection sample to avoid bias */
+            do {
+                r = prng_uint32(prng);
+                r &= 0x3FFFF; /* 18-bit mask — covers 2*GAMMA1 = 2^18 */
+            } while (r >= (uint32_t)(2 * GAMMA1));
+
+            /* Map to [-GAMMA1+1, GAMMA1] */
+            v->vec[i].coeffs[j] = (int32_t)r - GAMMA1 + 1;
+            /* Reduce mod Q into [0, Q-1] */
+            int64_t x = v->vec[i].coeffs[j];
+            x %= Q;
+            if (x < 0) x += Q;
+            v->vec[i].coeffs[j] = (int32_t)x;
+        }
+    }
+}
+
+/*
+ * Left-shift every coefficient by `shift` bits (multiply by 2^shift), mod Q.
+ * Used to compute 2^{ν_t} * (c * t'_pk).
+ */
+void polyvec_k_shift_left(polyvec_k_t *out,
+                          const polyvec_k_t *in,
+                          int shift)
+{
+    for (int i = 0; i < QS_K; i++)
+    {
+        for (int j = 0; j < QS_N; j++)
+        {
+            int64_t x = (int64_t)in->vec[i].coeffs[j] << shift;
+            x %= Q;
+            if (x < 0) x += Q;
+            out->vec[i].coeffs[j] = (int32_t)x;
+        }
+    }
+}
+
+/*
+ * Infinity norm of polyvec_k using centered representative in (-Q/2, Q/2].
+ */
+int32_t polyvec_k_norm_inf(const polyvec_k_t *v)
+{
+    int32_t max = 0;
+    for (int i = 0; i < QS_K; i++)
+    {
+        int32_t n = poly_norm_inf(&v->vec[i]);
+        if (n > max) max = n;
+    }
+    return max;
+}
+
+/*
+ * Infinity norm of polyvec_l using centered representative in (-Q/2, Q/2].
+ */
+int32_t polyvec_l_norm_inf(const polyvec_l_t *v)
+{
+    int32_t max = 0;
+    for (int i = 0; i < QS_L; i++)
+    {
+        int32_t n = poly_norm_inf(&v->vec[i]);
+        if (n > max) max = n;
+    }
+    return max;
+}
+
+/*
+ * Round every coefficient: out[i] = in[i] >> NU_W  (arithmetic right-shift)
+ * This implements round_{ν_w} applied to the whole polyvec.
+ */
+void polyvec_k_round_nuw(polyvec_k_t *out, const polyvec_k_t *in)
+{
+    for (int i = 0; i < QS_K; i++)
+    {
+        for (int j = 0; j < QS_N; j++)
+        {
+            int32_t x = in->vec[i].coeffs[j];
+
+            /* Step 1: centered representative in (-Q/2, Q/2] */
+            if (x > (int32_t)(Q / 2)) x -= (int32_t)Q;
+
+            /* Step 2: arithmetic right-shift (rounds toward -inf) */
+            int32_t rounded = x >> NU_W;
+
+            /*
+             * Step 3: normalize to [0, Q-1].
+             *
+             * This is critical for challenge hash consistency.
+             * poly_add/poly_sub always produce results in [0,Q-1],
+             * so the Hc serialization of w_agg_rounded (signer) and
+             * w' = h + y (verifier) must be in the same representation.
+             *
+             * Without this: -5 (signed) and Q-5=8380412 (from poly_add)
+             * produce completely different byte sequences for the same
+             * Z_q element, causing the challenge check to always fail.
+             */
+            if (rounded < 0) rounded += (int32_t)Q;
+
+            out->vec[i].coeffs[j] = rounded;
+        }
+    }
+}

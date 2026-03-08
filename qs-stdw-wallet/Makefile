@@ -1,6 +1,6 @@
 CC = gcc
 CFLAGS = -Wall -Wextra -O2 -std=c11 -MMD -MP
-INCLUDES = -Iconfig -Isrc -Isrc/common -Isrc/lattice -Isrc/keygen -Isrc/threshold
+INCLUDES = -Iconfig -Isrc -Isrc/common -Isrc/lattice -Isrc/keygen -Isrc/threshold -Isrc/signing -Isrc/verify -Isrc/derivation
 LIBS = -lcrypto
 
 # ================================
@@ -18,31 +18,44 @@ SRC_LATTICE = src/lattice/poly.c \
 SRC_KEYGEN = src/keygen/master_keygen.c
 
 SRC_THRESHOLD = src/threshold/shamir.c \
-                  src/threshold/rerandomize.c
+                src/threshold/rerandomize.c
 
 SRC_RANDPK = src/derivation/rand_pk.c
+
+SRC_SIGN = src/signing/challenge_hash.c \
+           src/signing/challenge_poly.c \
+           src/signing/combine.c \
+           src/signing/commit.c \
+           src/signing/lagrange.c \
+           src/signing/response.c \
+           src/signing/rounding.c \
+           src/verify/verify.c
+
 # ================================
 # Test files
 # ================================
 
-SRC_TEST_POLY = tests/test_poly.c
-SRC_TEST_MATRIX = tests/test_matrix.c
-SRC_TEST_MASTER = tests/test_master_keygen.c
-SRC_TEST_SHAMIR = tests/test_shamir.c
+SRC_TEST_POLY        = tests/test_poly.c
+SRC_TEST_MATRIX      = tests/test_matrix.c
+SRC_TEST_MASTER      = tests/test_master_keygen.c
+SRC_TEST_SHAMIR      = tests/test_shamir.c
 SRC_TEST_RERANDOMIZE = tests/test_rerandomize.c
-SRC_TEST_RANDPK = tests/test_randpk.c
+SRC_TEST_RANDPK      = tests/test_randpk.c
+SRC_TEST_SIGN        = tests/test_sign.c
+SRC_TEST_VERIFY      = tests/test_verify.c
 
 # ================================
 # Object files (core modules only)
 # ================================
 
-OBJS_COMMON = $(SRC_COMMON:.c=.o)
-OBJS_LATTICE = $(SRC_LATTICE:.c=.o)
-OBJS_KEYGEN = $(SRC_KEYGEN:.c=.o)
-OBJS_RANDPK = $(SRC_RANDPK:.c=.o)
+OBJS_COMMON    = $(SRC_COMMON:.c=.o)
+OBJS_LATTICE   = $(SRC_LATTICE:.c=.o)
+OBJS_KEYGEN    = $(SRC_KEYGEN:.c=.o)
+OBJS_RANDPK    = $(SRC_RANDPK:.c=.o)
 OBJS_THRESHOLD = $(SRC_THRESHOLD:.c=.o)
+OBJS_SIGN      = $(SRC_SIGN:.c=.o)
 
-OBJS_CORE = $(OBJS_COMMON) $(OBJS_LATTICE) $(OBJS_KEYGEN) $(OBJS_RANDPK) $(OBJS_THRESHOLD)
+OBJS_CORE = $(OBJS_COMMON) $(OBJS_LATTICE) $(OBJS_KEYGEN) $(OBJS_RANDPK) $(OBJS_THRESHOLD) $(OBJS_SIGN)
 
 DEPS = $(OBJS_CORE:.o=.d)
 
@@ -50,7 +63,7 @@ DEPS = $(OBJS_CORE:.o=.d)
 # Targets
 # ================================
 
-all: test_poly test_matrix test_master test_shamir test_rerandomize test_randpk
+all: test_poly test_matrix test_master test_shamir test_rerandomize test_randpk test_sign test_verify
 
 test_poly: $(OBJS_CORE) $(SRC_TEST_POLY:.c=.o)
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
@@ -70,6 +83,12 @@ test_rerandomize: $(OBJS_CORE) $(SRC_TEST_RERANDOMIZE:.c=.o)
 test_randpk: $(OBJS_CORE) $(SRC_TEST_RANDPK:.c=.o)
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
 
+test_sign: $(OBJS_CORE) $(SRC_TEST_SIGN:.c=.o)
+	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
+
+test_verify: $(OBJS_CORE) $(SRC_TEST_VERIFY:.c=.o)
+	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
+
 # ================================
 # Compile rule
 # ================================
@@ -83,8 +102,12 @@ clean:
 	      $(SRC_TEST_MATRIX:.c=.o) \
 	      $(SRC_TEST_MASTER:.c=.o) \
 	      $(SRC_TEST_SHAMIR:.c=.o) \
+	      $(SRC_TEST_RERANDOMIZE:.c=.o) \
+	      $(SRC_TEST_RANDPK:.c=.o) \
+	      $(SRC_TEST_SIGN:.c=.o) \
+	      $(SRC_TEST_VERIFY:.c=.o) \
 	      $(DEPS) \
-	      test_poly test_matrix test_master test_shamir test_rerandomize test_randpk
+	      test_poly test_matrix test_master test_shamir test_rerandomize test_randpk test_sign test_verify
 
 -include $(DEPS)
 
