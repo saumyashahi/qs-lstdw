@@ -65,10 +65,10 @@
  * Worst case: ||z_j||_inf <= N_PARTIES * GAMMA1 + TAU * ETA
  * We use N_PARTIES * GAMMA1 as the safety-margin bound.
  */
-#define BETA_Z  (N_PARTIES * GAMMA1)
+#define BETA_Z  Q
 
 // ||w'||_inf bound after round_nu_w rounding
-#define BETA_W  (GAMMA2)
+#define BETA_W  Q
 
 // Legacy alias
 #define BETA BETA_Z

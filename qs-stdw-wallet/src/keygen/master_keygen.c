@@ -8,6 +8,7 @@
 #include "../lattice/poly.h"
 #include "../lattice/polyvec.h"
 #include <string.h>
+#include <stdlib.h>
 
 /**
  * @brief Algorithm 1: QS-STDW.KGen(lambda, T, N)
@@ -70,7 +71,9 @@ void master_keygen(master_public_key_t *mpk,
     memcpy(mpk->seed_A, seed_A, SEED_BYTES);
 
     /* 7. Shamir split master secret */
-    shamir_share_t shares[MAX_PARTIES];
+    shamir_share_t *shares = malloc(N * sizeof(shamir_share_t));
+    if (!shares) return; // Allocation failed
+
     shamir_split(&master_s,
                  shares,
                  N,
@@ -82,6 +85,8 @@ void master_keygen(master_public_key_t *mpk,
         parties[i].id = i + 1;   // Shamir points start at 1
         parties[i].share = shares[i].value;
     }
+
+    free(shares);
 
     /* 9. Generate pairwise seeds */
     for (int i = 0; i < N; i++) {

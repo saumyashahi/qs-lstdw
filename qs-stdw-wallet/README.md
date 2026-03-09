@@ -1,12 +1,10 @@
 # QS-STDW: Quantum-Safe Stateless Threshold Deterministic Wallet
 
-Welcome to the C reference implementation for the **QS-STDW** protocol! 
-
 This repository provides a post-quantum secure, stateless, and threshold-based deterministic wallet designed explicitly for cryptocurrency networks. The protocol rerandomizes the keys of the **Threshold RACCOON** signature scheme to ensure both quantum-safety and strict transaction unlinkability on the blockchain.
 
 ---
 
-## 📖 Overview
+## Overview
 
 Standard deterministic wallets map a single seed phrase to millions of public addresses, but they act as a single point of failure. If the seed is compromised, all funds are lost. 
 
@@ -27,7 +25,30 @@ This code serves as the direct implementation of the 5 theoretical algorithms de
 
 ---
 
-## 🛠️ Building the Project
+## ⚡ Performance & Benchmarking
+
+The protocol scales predictably across drastically varying thresholds. The verification phase remains remarkably efficient ($< 1\text{ ms}$) and independent of the threshold size $T$, validating the framework's core statelessness objectives.
+
+*(Latency measured in milliseconds on a modern CPU)*
+| Threshold (T) | KeyGen | ShareSign_1 | ShareSign_2 | ShareSign_3 | Combine | Verify |
+|---|---|---|---|---|---|---|
+| **4** | 14.03 | 22.84 | 0.02 | 0.39 | 0.48 | **0.89** |
+| **16** | 14.79 | 58.93 | 0.03 | 1.44 | 0.49 | **0.83** |
+| **64** | 94.24 | 280.46 | 0.07 | 5.78 | 0.63 | **0.83** |
+| **256** | 971.83 | 1998.87 | 0.26 | 24.12 | 1.72 | **0.82** |
+| **1024** | 18181.27 | 28009.77 | 1.75 | 132.52 | 7.41 | **1.08** |
+
+To execute the threshold scaling benchmark natively (tests $T \in \{4, 16, 64, 256, 1024\}$):
+```bash
+make benchmark
+./benchmark
+```
+
+---
+
+## 🛠️ Build and Test
+
+### 1. Requirements
 
 This project is written in C11 and relies on a standard GCC toolchain. The SHAKE256 XOF primitives rely on OpenSSL.
 
@@ -46,7 +67,7 @@ make all
 
 ---
 
-## 🌐 Running the P2P Network Simulation
+## Running the P2P Network Simulation
 
 The easiest way to understand the repository is to run the **Network Simulator**. 
 
@@ -66,7 +87,7 @@ The `local_sim` binary spins up a local 5-node network broker, securely shards t
 
 ---
 
-## 🧪 Validating the Cryptography (Unit Tests)
+## Validating the Cryptography (Unit Tests)
 
 If you are a cryptography researcher and want to independently test the invariant bounds (Norm limitations, Shamir reconstructions, Deterministic Polynomial expansions), you can run the individual unit tests natively.
 
@@ -90,7 +111,7 @@ Every test outputs a strict `[PASS]` or `[FAIL]` UI banner.
 
 ---
 
-## 📂 Repository Structure
+## Repository Structure
 
 - `src/lattice/` - Core polynomial and matrix bounded mathematical structures ($Z_q$).
 - `src/keygen/` - Master key initializations (Algorithm 1).

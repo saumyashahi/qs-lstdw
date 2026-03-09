@@ -43,6 +43,7 @@ SRC_TEST_RERANDOMIZE = tests/test_rerandomize.c
 SRC_TEST_RANDPK      = tests/test_randpk.c
 SRC_TEST_SIGN        = tests/test_sign.c
 SRC_TEST_VERIFY      = tests/test_verify.c
+SRC_BENCHMARK        = tests/benchmark.c
 
 # ================================
 # Wallet & Network Simulation files
@@ -72,7 +73,7 @@ DEPS = $(OBJS_CORE:.o=.d) $(SRC_SIM:.c=.d)
 # Targets
 # ================================
 
-all: test_poly test_matrix test_master test_shamir test_rerandomize test_randpk test_sign test_verify local_sim
+all: test_poly test_matrix test_master test_shamir test_rerandomize test_randpk test_sign test_verify local_sim benchmark
 
 test_poly: $(OBJS_CORE) $(SRC_TEST_POLY:.c=.o)
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
@@ -101,6 +102,9 @@ test_verify: $(OBJS_CORE) $(SRC_TEST_VERIFY:.c=.o)
 local_sim: $(OBJS_CORE) $(SRC_SIM:.c=.o)
 	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
 
+benchmark: $(OBJS_CORE) $(SRC_BENCHMARK:.c=.o)
+	$(CC) $(CFLAGS) $^ $(LIBS) -o $@
+
 # ================================
 # Compile rule
 # ================================
@@ -118,9 +122,10 @@ clean:
 	      $(SRC_TEST_RANDPK:.c=.o) \
 	      $(SRC_TEST_SIGN:.c=.o) \
 	      $(SRC_TEST_VERIFY:.c=.o) \
+	      $(SRC_BENCHMARK:.c=.o) \
 	      $(SRC_SIM:.c=.o) \
 	      $(DEPS) \
-	      test_poly test_matrix test_master test_shamir test_rerandomize test_randpk test_sign test_verify local_sim
+	      test_poly test_matrix test_master test_shamir test_rerandomize test_randpk test_sign test_verify local_sim benchmark
 
 -include $(DEPS)
 

@@ -5,6 +5,7 @@
 #include "../lattice/sample.h"
 #include "../signing/challenge_poly.h"
 #include <string.h>
+#include <stdlib.h>
 
 /*
  * Helper: Identify our 0-based index in the active_set.
@@ -85,7 +86,9 @@ int wallet_sign_round1(qs_wallet_t *w,
     H(rho, rho_buf, sizeof(rho_buf));
 
     /* Generate f_j polynomial with small (ETA-bounded) coefficients */
-    polyvec_l_t f_coeffs[MAX_PARTIES];
+    polyvec_l_t *f_coeffs = malloc(w->threshold * sizeof(polyvec_l_t));
+    if (!f_coeffs) return -4; // Allocation failed
+
     qs_prng_t fj_prng;
     prng_init(&fj_prng, rho);
     for (int d = 0; d < w->threshold; d++) {
@@ -127,7 +130,11 @@ int wallet_sign_round1(qs_wallet_t *w,
      * Since `w->pairwise_seeds[k]` contains the seed shared with party `k+1`,
      * the seed with `active_set[j]` is at `w->pairwise_seeds[active_set[j] - 1]`.
      */
-    uint8_t active_pws[MAX_PARTIES][32];
+    uint8_t (*active_pws)[32] = malloc(active_count * 32);
+    if (!active_pws) {
+        free(f_coeffs);
+        return -4;
+    }
     for (int j = 0; j < active_count; j++) {
         int peer_id = active_set[j];
         memcpy(active_pws[j], w->pairwise_seeds[peer_id - 1], 32);
@@ -148,6 +155,9 @@ int wallet_sign_round1(qs_wallet_t *w,
     memset(out_commit, 0, sizeof(msg_commit_t));
     out_commit->sender_id = w->id;
     out_commit->commit_share = w->current_commit;
+
+    free(f_coeffs);
+    free(active_pws);
 
     return 0;
 }

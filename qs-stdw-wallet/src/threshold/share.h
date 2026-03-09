@@ -6,7 +6,7 @@
 #include "../../config/params.h"
 #include <stdint.h>
 
-#define MAX_PARTIES 5
+#define MAX_PARTIES 2048
 #define SEED_BYTES 32
 #define SIG_SK_BYTES 32
 #define SIG_PK_BYTES 32

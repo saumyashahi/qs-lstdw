@@ -5,6 +5,7 @@
 #include "../lattice/poly.h"
 #include "../lattice/polyvec.h"
 #include <string.h>
+#include <stdlib.h>
 
 /* derive 32-byte seed = H(chaincode || session_id) */
 static void derive_seed(uint8_t out[32],
@@ -83,7 +84,9 @@ void rerandomize_shares(party_secret_t parties[],
     uint8_t seed[32];
     derive_seed(seed, chaincode, session_id, session_len);
 
-    polyvec_l_t coeffs[T - 1];
+    polyvec_l_t *coeffs = malloc((T - 1) * sizeof(polyvec_l_t));
+    if (!coeffs) return; // Allocation failed
+
     generate_polyvec_coeffs(coeffs, T, seed);
 
     for (int i = 0; i < N; i++) {
@@ -99,4 +102,6 @@ void rerandomize_shares(party_secret_t parties[],
                       &parties[i].share,
                       &delta);
     }
+
+    free(coeffs);
 }
