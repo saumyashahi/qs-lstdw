@@ -13,7 +13,8 @@ SRC_LATTICE = src/lattice/poly.c \
               src/lattice/poly_from_seed.c \
               src/lattice/matrix.c \
               src/lattice/sample.c \
-              src/lattice/polyvec.c
+              src/lattice/polyvec.c \
+              src/lattice/ntt.c 
 
 SRC_KEYGEN = src/keygen/master_keygen.c
 

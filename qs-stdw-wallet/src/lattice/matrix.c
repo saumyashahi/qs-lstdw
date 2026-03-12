@@ -1,3 +1,4 @@
+#include "ntt.h"
 #include "matrix.h"
 #include "poly_from_seed.h"
 #include <string.h>
@@ -26,18 +27,33 @@ void matrix_vec_mul(polyvec_k_t *r,
                     const matrix_t *A,
                     const polyvec_l_t *s)
 {
-    for (int i = 0; i < QS_K; i++) {
+    polyvec_l_t s_ntt;
 
-        /* Initialize r_i to zero */
-        for (int c = 0; c < QS_N; c++)
-            poly_zero(&r->vec[i]);
+    polyvec_l_copy(&s_ntt, s);
+    polyvec_l_ntt(&s_ntt);
 
-        for (int j = 0; j < QS_L; j++) {
+    for (int i = 0; i < QS_K; i++)
+    {
+        poly_zero(&r->vec[i]);
 
+        for (int j = 0; j < QS_L; j++)
+        {
             poly_t tmp;
-            poly_mul(&tmp, &A->entries[i][j], &s->vec[j]);
+
+            poly_pointwise_mul(&tmp,
+                               &A->entries[i][j],
+                               &s_ntt.vec[j]);
 
             poly_add(&r->vec[i], &r->vec[i], &tmp);
         }
+
+        poly_invntt(&r->vec[i]);
     }
+}
+
+void matrix_ntt(matrix_t *A)
+{
+    for(int i = 0; i < QS_K; i++)
+        for(int j = 0; j < QS_L; j++)
+            poly_ntt(&A->entries[i][j]);
 }

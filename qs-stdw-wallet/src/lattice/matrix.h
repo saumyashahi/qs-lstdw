@@ -24,11 +24,14 @@ typedef struct {
 } polyvec_k_t;
 
 /* r = A * s */
+
 void matrix_vec_mul(polyvec_k_t *r,
-                    const matrix_t *A,
-                    const polyvec_l_t *s);
+                        const matrix_t *A,
+                        const polyvec_l_t *s);
 
 /* Expand matrix A using seed */
 void matrix_expand(matrix_t *A, const uint8_t seed[32]);
+
+void matrix_ntt(matrix_t *A);
 
 #endif

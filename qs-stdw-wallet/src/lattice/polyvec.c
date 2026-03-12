@@ -1,3 +1,4 @@
+#include "ntt.h"
 #include "polyvec.h"
 #include "../common/prng.h"
 
@@ -159,23 +160,51 @@ void polyvec_k_uniform(polyvec_k_t *v,
  * out[i] = c * v[i]  for all i in [L]
  * Polynomial ring multiplication of each component by challenge poly c.
  */
+/*
+ * out[i] = c * v[i]  for all i in [L]
+ *
+ * Bug fix: poly_pointwise_mul requires BOTH operands to be in NTT domain.
+ * The original code only converted c to NTT but left v->vec[i] in
+ * coefficient domain, producing garbage results.
+ *
+ * Fix: convert each v->vec[i] to NTT before the pointwise multiplication,
+ * then apply inverse NTT to recover the product in coefficient domain.
+ * c_ntt is computed once and reused across all L components for efficiency.
+ */
 void polyvec_l_mul_poly(polyvec_l_t *out,
                         const poly_t *c,
                         const polyvec_l_t *v)
 {
+    poly_t c_ntt;
+    poly_copy(&c_ntt, c);
+    poly_ntt(&c_ntt);
+
     for (int i = 0; i < QS_L; i++)
-        poly_mul(&out->vec[i], c, &v->vec[i]);
+    {
+        poly_t v_ntt;
+        poly_copy(&v_ntt, &v->vec[i]);
+        poly_ntt(&v_ntt);                              /* FIX: NTT the vector component */
+        poly_pointwise_mul(&out->vec[i], &c_ntt, &v_ntt);
+        poly_invntt(&out->vec[i]);
+    }
 }
 
-/*
- * out[i] = c * v[i]  for all i in [K]
- */
 void polyvec_k_mul_poly(polyvec_k_t *out,
                         const poly_t *c,
                         const polyvec_k_t *v)
 {
+    poly_t c_ntt;
+    poly_copy(&c_ntt, c);
+    poly_ntt(&c_ntt);
+
     for (int i = 0; i < QS_K; i++)
-        poly_mul(&out->vec[i], c, &v->vec[i]);
+    {
+        poly_t v_ntt;
+        poly_copy(&v_ntt, &v->vec[i]);
+        poly_ntt(&v_ntt);                              /* FIX: NTT the vector component */
+        poly_pointwise_mul(&out->vec[i], &c_ntt, &v_ntt);
+        poly_invntt(&out->vec[i]);
+    }
 }
 
 /*

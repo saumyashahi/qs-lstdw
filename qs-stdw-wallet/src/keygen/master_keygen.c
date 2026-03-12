@@ -45,6 +45,7 @@ void master_keygen(master_public_key_t *mpk,
 
     /* 2. Expand matrix A */
     matrix_expand(&mpk->A, seed_A);
+    matrix_ntt(&mpk->A);   
 
     /* 3. Sample master secret vector s */
     polyvec_l_t master_s;

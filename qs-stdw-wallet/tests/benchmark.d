@@ -21,7 +21,9 @@ tests/benchmark.o: tests/benchmark.c tests/../config/params.h \
  tests/../src/wallet/../net/../signing/sign.h \
  tests/../src/threshold/share.h tests/../src/net/message.h \
  tests/../src/lattice/polyvec.h tests/../src/signing/challenge_poly.h \
- tests/../src/signing/../lattice/poly.h
+ tests/../src/signing/../lattice/poly.h tests/../src/derivation/rand_pk.h \
+ tests/../src/derivation/../lattice/polyvec.h \
+ tests/../src/derivation/../lattice/matrix.h
 tests/../config/params.h:
 tests/../src/common/hash.h:
 tests/../src/keygen/master_keygen.h:
@@ -54,3 +56,6 @@ tests/../src/net/message.h:
 tests/../src/lattice/polyvec.h:
 tests/../src/signing/challenge_poly.h:
 tests/../src/signing/../lattice/poly.h:
+tests/../src/derivation/rand_pk.h:
+tests/../src/derivation/../lattice/polyvec.h:
+tests/../src/derivation/../lattice/matrix.h:
