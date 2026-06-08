@@ -2,18 +2,15 @@
 #define MASTER_KEYGEN_H
 
 #include <stdint.h>
-#include "lattice/poly.h"
-#include "lattice/matrix.h"
+#include "../lattice/poly.h"
+#include "../lattice/matrix.h"
 #include "../threshold/share.h"
-
-#define SEED_BYTES 32
-#define QS_L 4
-#define QS_K 4
+#include "../../config/params.h"
 
 typedef struct {
-    matrix_t A;
+    matrix_t    A;
     polyvec_k_t t;
-    uint8_t seed_A[SEED_BYTES];
+    uint8_t     seed_A[SEED_BYTES];
 } master_public_key_t;
 
 void master_keygen(master_public_key_t *mpk,
@@ -22,4 +19,4 @@ void master_keygen(master_public_key_t *mpk,
                    int N,
                    int T);
 
-#endif
+#endif /* MASTER_KEYGEN_H */
