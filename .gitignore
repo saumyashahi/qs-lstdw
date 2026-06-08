@@ -5,6 +5,7 @@
 *.dll
 *.so
 *.a
+*.d
 
 # VS Code
 .vscode/
