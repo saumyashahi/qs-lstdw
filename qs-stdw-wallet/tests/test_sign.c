@@ -37,7 +37,7 @@
 #define N_SIGNERS   3
 #define T_SIGNERS   2
 
-#define PK_BYTES ((size_t)(QS_K * QS_N * 4))
+#define PK_BYTES ((size_t)(QS_K * QS_N * 7))
 
 static void pk_to_bytes(uint8_t *out, const polyvec_k_t *pk)
 {
@@ -57,15 +57,15 @@ static void eval_rerand_poly(polyvec_l_t *out,
                              int x_val)
 {
     polyvec_l_zero(out);
-    int64_t power = 1;  /* x^d */
+    __int128 power = 1;  /* x^d mod q */
 
     for (int d = 0; d < T; d++) {
         polyvec_l_t term;
         polyvec_l_copy(&term, &coeffs[d]);
-        /* term = coeffs[d] * x^d  (scalar multiply, mod Q) */
-        polyvec_l_mul_scalar(&term, (int32_t)(power % (int64_t)Q));
+        int64_t pw = (int64_t)(power % (__int128)RACCOON_Q);
+        polyvec_l_mul_scalar(&term, pw);
         polyvec_l_add(out, out, &term);
-        power = power * x_val;
+        power = (power * x_val) % (__int128)RACCOON_Q;
     }
 }
 
@@ -167,7 +167,7 @@ static int run_sign_verify(
     polyvec_l_t z_shares[T_SIGNERS];
     for (int idx = 0; idx < T_SIGNERS; idx++) {
         int k = active_set[idx];
-        int32_t lambda = qs_lagrange_coeff_modq(k, active_set, T_SIGNERS);
+        int64_t lambda = qs_lagrange_coeff_modq(k, active_set, T_SIGNERS);
         qs_sign_response(&z_shares[idx], &commits[idx].r, &sk_session[idx],
                          &commits[idx].m_col, &c_poly, lambda);
     }
@@ -225,8 +225,8 @@ int main(void)
 {
     printf("QS-STDW Threshold Signing and Verification Test\n");
     printf("================================================\n");
-    printf("Parameters: N=%d, Q=%d, K=%d, L=%d, T=%d of %d\n",
-           QS_N, Q, QS_K, QS_L, T_SIGNERS, N_SIGNERS);
+    printf("Parameters: N=%d, Q=%lld, K=%d, L=%d, T=%d of %d\n",
+           QS_N, RACCOON_Q, QS_K, QS_L, T_SIGNERS, N_SIGNERS);
 
     int total_failures = 0;
 
@@ -241,6 +241,7 @@ int main(void)
     prng_squeeze(&prng, seed_A, 32);
     matrix_t A;
     matrix_expand(&A, seed_A);
+    matrix_ntt(&A);
 
     polyvec_l_t master_s;
     for (int i = 0; i < QS_L; i++) sample_small_poly(&master_s.vec[i], &prng);
