@@ -41,7 +41,7 @@ typedef struct {
 
     /* Rerandomized keys for the active session */
     polyvec_k_t session_pk;                     /* t'_{pk_j} */
-    uint8_t session_pk_bytes[QS_K * QS_N * 4];  /* Serialized session public key */
+    uint8_t session_pk_bytes[QS_K * QS_N * 7];  /* Serialized session public key */
     polyvec_l_t session_sk_share;               /* sk_{j,k} = s_k + f_j(k) */
 
     /* Round 1 state to keep for Round 3 */
