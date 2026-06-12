@@ -2,24 +2,6 @@
 
 This repository provides a post-quantum secure, stateless, and threshold-based deterministic wallet designed explicitly for cryptocurrency networks. The protocol rerandomizes the keys of the **Threshold RACCOON** signature scheme to ensure both quantum-safety and strict transaction unlinkability on the blockchain.
 
-
-## Overview
-
-Standard deterministic wallets map a single seed phrase to millions of public addresses, but they act as a single point of failure. If the seed is compromised, all funds are lost. 
-
-**QS-STDW** solves this by:
-1. **Threshold Security (Shamir's Secret Sharing):** The master seed is sharded among $N$ participants. A signature requires exactly $T$ participants to authorize a transaction.
-2. **Stateless Unlinkability:** Every transaction is tied to a one-time "session". The wallet mathematically derives a *new* public/private key pair per session. Observers cannot link two transactions to the same master identity.
-3. **Post-Quantum Resistance:** The signature generation and derivations are built entirely upon hard module-lattice mathematical assumptions.
-
-### The Cryptographic Papers
-This code serves as the direct implementation of the 5 theoretical algorithms defined in the QS-STDW specification:
-- **Algorithm 1 (KGen):** Master Key Generation & Sharding
-- **Algorithm 2 (RandSK):** Deterministic Secret Share Rerandomization
-- **Algorithm 3 (RandPK):** Deterministic Public Key Rerandomization
-- **Algorithm 4 (Sign):** A completely distributed, zero-knowledge 3-round Threshold Signature protocol.
-- **Algorithm 5 (Verify):** Third-party Lattice Signature Verification.
-
 ## Parameters
  
 | Parameter | Value |
@@ -34,6 +16,23 @@ This code serves as the direct implementation of the 5 theoretical algorithms de
 | Masks | Uniform [−2^44, 2^44] |
 | NTT | CRT-split 512-pt over p1 and p2 |
 | Hash | SHAKE256 (OpenSSL 3) — only external dep |
+
+## Overview
+
+Standard deterministic wallets map a single seed phrase to millions of public addresses, but they act as a single point of failure. If the seed is compromised, all funds are lost. 
+
+**QS-STDW** solves this by:
+1. **Threshold Security (Shamir's Secret Sharing):** The master seed is sharded among $N$ participants. A signature requires exactly $T$ participants to authorize a transaction.
+2. **Stateless Unlinkability:** Every transaction is tied to a one-time "session". The wallet mathematically derives a *new* public/private key pair per session. Observers cannot link two transactions to the same master identity.
+3. **Post-Quantum Resistance:** The signature generation and derivations are built entirely upon hard module-lattice mathematical assumptions.
+
+This code serves as the direct implementation of the 5 theoretical algorithms defined in the QS-STDW specification:
+- **Algorithm 1 (KGen):** Master Key Generation & Sharding
+- **Algorithm 2 (RandSK):** Deterministic Secret Share Rerandomization
+- **Algorithm 3 (RandPK):** Deterministic Public Key Rerandomization
+- **Algorithm 4 (Sign):** A completely distributed, zero-knowledge 3-round Threshold Signature protocol.
+- **Algorithm 5 (Verify):** Third-party Lattice Signature Verification.
+
 
 ## Benchmark (Intel i5-1235U, 1.30 GHz, WSL2, mean ± σ over 5 runs)
  
